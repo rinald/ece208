@@ -1,0 +1,5 @@
+{
+    "editor.formatOnSave": true,
+    "python.linting.mypyEnabled": true,
+    "python.pythonPath": "/home/rinald/.local/share/virtualenvs/numerical-analysis-Wf3w62HJ/bin/python",
+}
