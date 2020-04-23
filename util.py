@@ -1,6 +1,7 @@
 from sympy import *
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 x, y = symbols('x y', real=True)
 
@@ -19,14 +20,22 @@ def plot_function(f, r):
 
 def bisection(f, a, b, n=5, t=10**-2):
     _p = a
+    root = nsolve(f, a)
+
+    _ex = [a, b]
+    _x = [a, b]
+    _e = [np.nan, np.nan]
+
     a = Rational(a)
     b = Rational(b)
     g = f.subs(x, y)
 
-    for i in range(n):
+    for _ in range(n):
         if f.subs(x, a)*g.subs(y, b) < 0:
             p = (a+b)/2
-            print(f'x{i+1} = {p} = {N(p)}')
+            _ex.append(p)
+            _x.append(N(p))
+            _e.append(f'{N(abs(b-a)/2):.15f}')
 
             if (b-a)/2 < t:
                 break
@@ -40,47 +49,112 @@ def bisection(f, a, b, n=5, t=10**-2):
         else:
             break
 
-    print()
-    show_roots(f, _p)
+    _x.append(root)
+    _e.append(f'{0.0:.15f}')
+    _ex.append(np.nan)
+
+    df = pd.DataFrame({
+        'x (exact)': _ex,
+        'x': _x,
+        'error': _e,
+    })
+
+    df = df.rename(index={len(df)-1: 'root'})
+
+    return df
 
 
 def newton(f, p0, n=10, t=10**-8, exact=False):
     _p = p0
-    p0 = Rational(p0)
-    f_ = diff(f, x)
+    f_ = diff(f)
+    root = nsolve(f, p0)
 
-    for i in range(n):
-        if not exact:
-            p = N(p0 - f.subs(x, p0)/f_.subs(x, p0))
-            print(f'x{i+1} ~= {p}')
-        else:
+    _x = [p0]
+    _e = [np.nan]
+
+    if exact:
+        _ex = [p0]
+
+    p0 = Rational(p0)
+
+    for _ in range(n):
+        if exact:
             p = p0 - f.subs(x, p0)/f_.subs(x, p0)
-            print(f'x{i+1} = {p} ~= {N(p)}')
+            _ex.append(p)
+            _x.append(N(p))
+        else:
+            p = N(p0 - f.subs(x, p0)/f_.subs(x, p0))
+            _x.append(p)
+
+        _e.append(f'{N(abs(p-p0)):.15f}')
 
         if abs(p-p0) < t:
             break
 
         p0 = p
 
-    print()
-    show_roots(f, _p)
+    _x.append(root)
+    _e.append(f'{0.0:.15f}')
+
+    if exact:
+        _ex.append(np.nan)
+        d = {'x (exact)': _ex}
+    else:
+        d = {}
+
+    df = pd.DataFrame({
+        **d,
+        'x': _x,
+        'error': _e,
+    })
+
+    df = df.rename(index={len(df)-1: 'root'})
+
+    return df
 
 
 def secant(f, a, b, n=10, t=10**-8, exact=False):
     _p = a
+    root = nsolve(f, a)
+
+    _x = [a, b]
+    _e = [np.nan, np.nan]
+
+    if exact:
+        _ex = [a, b]
+
     a = Rational(a)
     b = Rational(b)
 
-    for i in range(n):
-        if not exact:
-            a, b = b, N(b - f.subs(x, b)*(b-a)/(f.subs(x, b) - f.subs(x, a)))
-            print(f'x{i+2} ~= {b}')
-        else:
+    for _ in range(n):
+        if exact:
             a, b = b, b - f.subs(x, b)*(b-a)/(f.subs(x, b) - f.subs(x, a))
-            print(f'x{i+2} = {b} ~= {N(b)}')
+            _ex.append(b)
+            _x.append(N(b))
+        else:
+            a, b = b, N(b - f.subs(x, b)*(b-a)/(f.subs(x, b) - f.subs(x, a)))
+            _x.append(b)
 
-        if abs((b-a)/b) < t:
+        _e.append(f'{N(abs(b-a)):.15f}')
+
+        if abs(b-a) < t:
             break
 
-    print()
-    show_roots(f, _p)
+    _x.append(root)
+    _e.append(f'{0.0:.15f}')
+
+    if exact:
+        _ex.append(np.nan)
+        d = {'x (exact)': _ex}
+    else:
+        d = {}
+
+    df = pd.DataFrame({
+        **d,
+        'x': _x,
+        'error': _e,
+    })
+
+    df = df.rename(index={len(df)-1: 'root'})
+
+    return df
