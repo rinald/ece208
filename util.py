@@ -24,7 +24,7 @@ def bisection(f, a, b, n=5, t=10**-2):
 
     _ex = [a, b]
     _x = [a, b]
-    _e = [np.nan, np.nan]
+    _e = ['', '']
 
     a = Rational(a)
     b = Rational(b)
@@ -51,7 +51,7 @@ def bisection(f, a, b, n=5, t=10**-2):
 
     _x.append(root)
     _e.append(f'{0.0:.15f}')
-    _ex.append(np.nan)
+    _ex.append('')
 
     df = pd.DataFrame({
         'x (exact)': _ex,
@@ -70,7 +70,7 @@ def newton(f, p0, n=10, t=10**-8, exact=False):
     root = nsolve(f, p0)
 
     _x = [p0]
-    _e = [np.nan]
+    _e = ['']
 
     if exact:
         _ex = [p0]
@@ -97,7 +97,7 @@ def newton(f, p0, n=10, t=10**-8, exact=False):
     _e.append(f'{0.0:.15f}')
 
     if exact:
-        _ex.append(np.nan)
+        _ex.append('')
         d = {'x (exact)': _ex}
     else:
         d = {}
@@ -105,7 +105,7 @@ def newton(f, p0, n=10, t=10**-8, exact=False):
     df = pd.DataFrame({
         **d,
         'x': _x,
-        'error': _e,
+        'error (%)': _e,
     })
 
     df = df.rename(index={len(df)-1: 'root'})
@@ -118,7 +118,7 @@ def secant(f, a, b, n=10, t=10**-8, exact=False):
     root = nsolve(f, a)
 
     _x = [a, b]
-    _e = [np.nan, np.nan]
+    _e = ['', '']
 
     if exact:
         _ex = [a, b]
@@ -144,7 +144,7 @@ def secant(f, a, b, n=10, t=10**-8, exact=False):
     _e.append(f'{0.0:.15f}')
 
     if exact:
-        _ex.append(np.nan)
+        _ex.append('')
         d = {'x (exact)': _ex}
     else:
         d = {}
@@ -152,9 +152,77 @@ def secant(f, a, b, n=10, t=10**-8, exact=False):
     df = pd.DataFrame({
         **d,
         'x': _x,
-        'error': _e,
+        'error (%)': _e,
     })
 
     df = df.rename(index={len(df)-1: 'root'})
 
     return df
+
+
+def L(n, i, xx):
+    p = 1
+
+    for j in range(n):
+        if j == i:
+            continue
+
+        p *= (x-xx[j])/(xx[i]-xx[j])
+
+    return p
+
+
+def interpolation(xx, yy, n=0):
+    xx = list(map(Rational, xx.split()))
+    yy = list(map(Rational, yy.split()))
+
+    assert len(xx) == len(yy)
+
+    if n == 0:
+        n = len(xx)
+
+    f = 0
+
+    for i in range(n):
+        f += factor(L(n, i, xx) * yy[i])
+
+    return f, expand(f)
+
+
+def div_diff(xx, yy, i, j):
+    if j-i == 1:
+        return (yy[j] - yy[i])/(xx[j] - xx[i])
+    else:
+        return (div_diff(xx, yy, i+1, j) - div_diff(xx, yy, i, j-1))/(xx[j] - xx[i])
+
+
+def b(xx, yy, i):
+    if i == 0:
+        return yy[0]
+    else:
+        return div_diff(xx, yy, 0, i)
+
+
+def p(xx, i):
+    _p = 1
+
+    for j in range(i):
+        _p *= (x-xx[j])
+
+    return _p
+
+
+def newton_interpolation(xx, yy):
+    xx = list(map(Rational, xx.split()))
+    yy = list(map(Rational, yy.split()))
+
+    assert len(xx) == len(yy)
+
+    n = len(xx)
+
+    f = 0
+
+    for i in range(n):
+        f += b(xx, yy, i)*p(xx, i)
+
+    return f, expand(f)
