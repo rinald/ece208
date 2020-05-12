@@ -1,21 +1,4 @@
-from sympy import *
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-
-x, y = symbols('x y', real=True)
-
-
-def show_roots(f, p):
-    print(f'Actual root:')
-    print(nsolve(f, p))
-
-
-def plot_function(f, r):
-    _x = np.linspace(r[0], r[1])
-    _y = f(_x)
-
-    plt.plot(_x, _y)
+from .util import *
 
 
 def bisection(f, a, b, n=5, t=10**-2):
@@ -160,69 +143,25 @@ def secant(f, a, b, n=10, t=10**-8, exact=False):
     return df
 
 
-def L(n, i, xx):
-    p = 1
+def gauss_seidel(a, b, n=10, exact=False):
+    assert (m := len(a)) == len(a[0]) == len(b)
 
-    for j in range(n):
-        if j == i:
-            continue
+    _x = [Rational(0)] * m
+    _y = []
 
-        p *= (x-xx[j])/(xx[i]-xx[j])
+    for _ in range(n):
+        for i in range(m):
+            s = 0
 
-    return p
+            for j in range(m):
+                if j != i:
+                    s += a[i][j]*_x[j]
+            if not exact:
+                _y.append(N((b[i] - s) / a[i][i]))
+            else:
+                _y.append((b[i] - s) / a[i][i])
 
+        _x = _y
+        _y = []
 
-def interpolation(xx, yy, n=0):
-    xx = list(map(Rational, xx.split()))
-    yy = list(map(Rational, yy.split()))
-
-    assert len(xx) == len(yy)
-
-    if n == 0:
-        n = len(xx)
-
-    f = 0
-
-    for i in range(n):
-        f += factor(L(n, i, xx) * yy[i])
-
-    return f, expand(f)
-
-
-def div_diff(xx, yy, i, j):
-    if j-i == 1:
-        return (yy[j] - yy[i])/(xx[j] - xx[i])
-    else:
-        return (div_diff(xx, yy, i+1, j) - div_diff(xx, yy, i, j-1))/(xx[j] - xx[i])
-
-
-def b(xx, yy, i):
-    if i == 0:
-        return yy[0]
-    else:
-        return div_diff(xx, yy, 0, i)
-
-
-def p(xx, i):
-    _p = 1
-
-    for j in range(i):
-        _p *= (x-xx[j])
-
-    return _p
-
-
-def newton_interpolation(xx, yy):
-    xx = list(map(Rational, xx.split()))
-    yy = list(map(Rational, yy.split()))
-
-    assert len(xx) == len(yy)
-
-    n = len(xx)
-
-    f = 0
-
-    for i in range(n):
-        f += b(xx, yy, i)*p(xx, i)
-
-    return f, expand(f)
+        print(_x)
