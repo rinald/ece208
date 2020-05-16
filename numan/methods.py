@@ -2,6 +2,8 @@ from .util import *
 
 
 def bisection(f, a, b, n=5, t=10**-2):
+    '''Bisection method.'''
+
     _p = a
     root = nsolve(f, a)
 
@@ -48,6 +50,8 @@ def bisection(f, a, b, n=5, t=10**-2):
 
 
 def newton(f, p0, n=10, t=10**-8, exact=False):
+    '''Newton method.'''
+
     _p = p0
     f_ = diff(f)
     root = nsolve(f, p0)
@@ -97,6 +101,8 @@ def newton(f, p0, n=10, t=10**-8, exact=False):
 
 
 def secant(f, a, b, n=10, t=10**-8, exact=False):
+    '''Secant method.'''
+
     _p = a
     root = nsolve(f, a)
 
@@ -143,7 +149,14 @@ def secant(f, a, b, n=10, t=10**-8, exact=False):
     return df
 
 
-def gauss_seidel(a, b, n=10, exact=False):
+def gauss_seidel(a: list, b: list, n=10, exact=False):
+    '''Gauss-Seidel method.
+
+    Solves linear systems of equations iteratively.
+    To guarantee convergence, the matrix a needs to
+    be diagonally dominant and d(a) != 0.
+    '''
+
     assert (m := len(a)) == len(a[0]) == len(b)
 
     _x = [Rational(0)] * m
