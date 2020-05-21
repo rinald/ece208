@@ -1,23 +1,30 @@
 from .util import *
 
 
-def lagrangian(xx: str, yy: str, n: int = 0):
-    '''Lagrangian interpolation.'''
+def _convert(x):
+    if isinstance(x, (int, float, str)):
+        return Rational(str(x))
+    else:
+        return x
 
-    xx = list(map(Rational, xx.split()))
-    yy = list(map(Rational, yy.split()))
+
+def lagrangian(xx: list, yy: list, n: int = -1):
+    '''Lagrangian interpolation.'''
 
     assert len(xx) == len(yy)
 
-    if n == 0:
-        n = len(xx)
+    xx = list(map(_convert, xx))
+    yy = list(map(_convert, yy))
+
+    if n == -1:
+        n = len(xx)-1
 
     f = 0
 
-    for i in range(n):
+    for i in range(n+1):
         f += factor(L(n, i, xx) * yy[i])
 
-    return f, expand(f)
+    return f, collect(expand(f), x)
 
 
 def newton(xx: str, yy: str, n: int = 0):
@@ -35,4 +42,4 @@ def newton(xx: str, yy: str, n: int = 0):
     for i in range(n):
         f += b(xx, yy, i)*p(xx, i)
 
-    return f, expand(f)
+    return f, collect(expand(f), x)

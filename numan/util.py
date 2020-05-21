@@ -21,7 +21,7 @@ def plot_function(f, r):
 def L(n, i, xx):
     p = 1
 
-    for j in range(n):
+    for j in range(n+1):
         if j == i:
             continue
 

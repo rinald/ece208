@@ -1,5 +1,6 @@
 {
-    "python.pythonPath": "/home/rinald/.cache/pypoetry/virtualenvs/ece208-KhMjoj8B-py3.8/bin/python",
+    "python.venvPath": "/home/rinald/.cache/pypoetry/virtualenvs/",
+    "python.pythonPath": "/home/rinald/.cache/pypoetry/virtualenvs/ece208-m62qUVzV-py3.8/bin/python",
     "editor.formatOnSave": true,
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,

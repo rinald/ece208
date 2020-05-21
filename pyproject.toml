@@ -12,6 +12,7 @@ numpy = "^1.18.2"
 matplotlib = "^3.2.1"
 sympy = "^1.5.1"
 pandas = "^1.0.3"
+ipympl = "^0.5.6"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5"
