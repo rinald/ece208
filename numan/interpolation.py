@@ -8,13 +8,13 @@ def _convert(x):
         return x
 
 
-def lagrangian(xx: list, yy: list, n: int = -1):
+def lagrangian(xx: str, yy: str, n: int = -1):
     '''Lagrangian interpolation.'''
 
-    assert len(xx) == len(yy)
+    xx = list(map(Rational, xx.split()))
+    yy = list(map(Rational, yy.split()))
 
-    xx = list(map(_convert, xx))
-    yy = list(map(_convert, yy))
+    assert len(xx) == len(yy)
 
     if n == -1:
         n = len(xx)-1
@@ -35,7 +35,10 @@ def newton(xx: str, yy: str, n: int = 0):
 
     assert len(xx) == len(yy)
 
-    n = len(xx)
+    if n == 0:
+        n = len(xx)
+    else:
+        n += 1
 
     f = 0
 

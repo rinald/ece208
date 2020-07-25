@@ -167,6 +167,33 @@ def gauss_seidel(a: list, b: list, n=10, exact=False):
             s = 0
 
             for j in range(m):
+                if j < i:
+                    s += a[i][j]*_y[j]
+                elif j > i:
+                    s += a[i][j]*_x[j]
+
+            if not exact:
+                _y.append(N((b[i] - s) / a[i][i]))
+            else:
+                _y.append((b[i] - s) / a[i][i])
+
+        _x = _y
+        _y = []
+
+        print(_x)
+
+
+def lagrangian(a: list, b: list, n=10, exact=False):
+    assert (m := len(a)) == len(a[0]) == len(b)
+
+    _x = [Rational(0)] * m
+    _y = []
+
+    for _ in range(n):
+        for i in range(m):
+            s = 0
+
+            for j in range(m):
                 if j != i:
                     s += a[i][j]*_x[j]
             if not exact:
